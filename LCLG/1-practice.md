@@ -99,4 +99,4 @@ $
 
 Take a look at them on GitHub. You can download and run this script to see how it works. You can also use it as a reference for your own solution if you get stuck
 
-https://github.com/LinuxHackersClub/presentations/blob/master/LCLG/solutions/1-bash-practice.sh
+https://github.com/LinuxHackersClub/presentations/blob/master/LCLG/solutions/1-practice.sh

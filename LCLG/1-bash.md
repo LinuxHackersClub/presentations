@@ -15,6 +15,8 @@ styles:
 
 This is the secound presentation in LCLG series by Linux Hackers Club and this time we will talk about Bash shell which is the default in most major Linux ditributions. We will discuss its ~~scary~~ syntax, the `if-else` branches, `for` and `while` loops and many different things that will come handy when using terminals
 
+---
+
 # What is shell
 
 Remember from the first presentation:
@@ -22,7 +24,9 @@ Remember from the first presentation:
 
 There are generally two types of shells: Bourne shell aka POSIX sh ([while these are not absolutely the same, they are mostly identical](POSIX sh is the standard based on Bourne and adds just a few new things)), and C shell. The latter is surprisingly for me still alive, but mostly used in BSD-based systems. In fact, nowadays `tcsh`, the improved `csh`, is actively developed
 
-Linux users typically use POSIX-compliant shells ([that's still not totally true](most shells includeing Bash and Zsh are by default not fully POSIX, but invoking them with special flags or environment variables makes them closer to POSIX sh, on some modern systems /bin/sh is a symlink to /bin/bash)). Debian, Ubuntu, Arch and most other distros use Bash as main shell (though Arch installation ISO comes with neat Zsh), but e.g. Parrot OS defaults to Zsh. Anyway, their syntax is mostly identical so scripts written in Bash are very likely to be executed by Zsh with little-to-no problems
+Linux users typically use POSIX-compliant shells ([that's still not totally true](most shells includeing Bash and Zsh are by default not fully POSIX, but invoking them with special flags or environment variables makes them closer to POSIX sh, on some modern systems /bin/sh is a symlink to /bin/bash)). Debian, Ubuntu, Arch and most other distros use Bash as main shell (though Arch installation ISO comes with neat Zsh), but some distros and MacOS defaults to Zsh. Anyway, their syntax is mostly identical so scripts written in Bash are very likely to be executed by Zsh with little-to-no problems
+
+---
 
 # Basic operations
 
@@ -36,14 +40,33 @@ In the first presentation we discussed commands like `ls`, `cat` etc. which are 
 
 But you can't achieve much by just running these executables as is. To pass arguments to them, type them after a command separated by spaces, for example, `cat file1.txt file2.md` will display content of `file1.txt` and `file2.md` in order they are specified - [what if one has file with spaces in the name, e.g. "my cool file.txt"?](you can use the `\ ` to escape the space, or just use quotes - `"my cool file.txt"` or `'my cool file.txt'`)
 
-## Changing environment
+## Simple variables
 
-You can use variables not to repeate yourself many times. To set a variable, type `key=value`, where both key and value cannot contain spaces, also it is not allowed to use spaces around equality sign. If you need a space in value, enclose it in quotes. You can also use `declare [FLAGS] key=value` to set some attributes to the variable, e.g. indicate that it is an integer with `-i` or make it readonly with `-r`. To use this variable later, [prefix its name with dollar sign](a common practice is to always use ${key}), e.g. `echo $key`. If a variable is not readonly (default), then you can always redefine it (possibly with other attributes). To unset var, use `unset key`. To append string to it, use `key+=value2` - the same syntax applies to integers incrementing, but only if var is declared with `-i`. To decrement integer, one can just invert a number, e.g. `int+=-7`. For advanced integer operations, one should use `let "OPERATIONS"` - note however that `let` itself does not make a variable an integer
+To set a variable, type `key=value`, where both key and value cannot contain spaces, also it is not allowed to use spaces around equality sign. If you need a space in value, enclose it in quotes. To use this variable later, [prefix its name with dollar sign](a common practice is to always use ${key}), e.g. `echo $key`. If a variable is not readonly (default), then you can always redefine it (possibly with other attributes). To unset var, use `unset key`. To append string to it, use `key+=value2` - the same syntax applies to integers incrementing, but only if variable has appropriate attribute (check the next section). To decrement integer, one can just invert a number, e.g. `int+=-7`. For advanced integer operations, one should use `let "EXPRESSION"` - note however that `let` itself does not make a variable an integer
+
+---
+
+# Variables declarations
+
+Variables can also be declared with a `declare` keyword which is used for more advanced tuning like setting attributes
+
+## List of attributes
+
+As it was mentioned before, you can use `declare` keyword to set attributes to variables during its initialization or later. It supports the following important keys:
+
+- `-g` to make variable global (ignored outside functions) - variables set without `declare` keyword are global by default
+- `-I` to copy attributes of global variable with the same name to the local one
+- `-a` and `-A` for arrays indexed and associative
+- `-i` for integers (no ~~bitches~~ floats?)
+- `-n` to make variable a reference to another variable with the name of value of initial variable (in other words, this is what `${!name}` does, e.g. `declare -n var=str` will make `var` a *pointer* to `str`, and later `var="some value"` can be used to set `str` variable)
+- `-l` and `-u` to convert strings to UPPER or lowercase when assigning new value - even after declaration - but does not impact whatever is already stored
+- `-r` for readonly and `-x` for export - both can be set using their own keyword, e.g. `export var="Bruh"`
 
 ## Arrays
 
-Bash also support arrays - both indexed and associatives, though none of them can be multi-dimensional. To create an array, use `name=( value1 value2 ... )`, or `name=( [key1]=value1 [key2]=value2 ... )` for associative arrays. Their flags in `declare` are `-a` and `-A` respectively. To get an elements of array, use `${name[key]}` syntax, or `$name` to get the first element (index 0), or `${name[@]}` to get all of them - [what if key associative array is @?](use quoted @). 
+Bash both indexed and associative arrays, though none of them can be multi-dimensional. To create an array, use `name=( value1 value2 ... )`, or `name=( [key1]=value1 [key2]=value2 ... )` for associative arrays. To get an elements of array, use `${name[key]}` syntax, or `$name` to get the first element (index 0), or `${name[@]}` to get all of them - [what if key associative array is @?](use quoted @). Note that Bash cannot convert indexed array to associative but somehow can do the opposite
 
+---
 
 # Advanced variables operations
 
@@ -65,38 +88,34 @@ If we have variable `var=str`, then we can get value of `$str` by using `${!var}
 
 Let's set variable `myvar="Hello, this beautiful World!"`. How do we get for example parts after *,* or before *W* without external tools? We can use operators `${myvar#*,}` and `${myvar%W*}`. This technique can be used to get the first or the last line/word of string easily
 
+---
 
-# Other things with variable
+# Special variables
 
-Just one more page before we leave variables topic
-
-## Declarations
-
-As it was mentioned before, you can use `declare` keyword to set attributes to variables, both during creation or somewhere later. It supports the following important keys:
-
-- `-g` to make variable global (ignored outside functions) - variables set without `declare` keyword are global by default
-- `-I` to copy attributes of global variable with the same name to the local one
-- `-a` and `-A` for arrays indexed and associative
-- `-i` for integers (no ~~bitches~~ floats?)
-- `-n` to make variable a reference to another variable with the name of value of initial variable (in other words, this is what `${!name}` does, e.g. `declare -n var=str` will make `var` a *pointer* to `str`, and later `var="some value"` can be used to set `str` variable)
-- `-l` and `-u` to convert strings to UPPER or lowercase when assigning new value - even after declaration - but does not impact whatever is already stored
-- `-r` for readonly and `-x` for export - both can be set using their own keyword, e.g. `export MYVAR="Hello, World!"`
-
-## Special variables
-
-Bash gives us some special variables which can be used to obtain some useful info in scripts. Here is a list of the most often used:
+Bash gives us some special variables which can be used to obtain some useful info in scripts. Here is a list of the most known/used:
 
 - `$$` is current Process ID - changes only when you start a new shell
 - `$PPID` is Parent Process ID - points to the process that created the current one
 - `$?` is exit (aka return) code of the last command - 0 means Ok, 1 and greater Err
-- `$1`, `$2` etc. are positional arguments passed to function/scripts, e.g. when using `cat file1 file2` then `$1` is file1 and `$2` is file2
-- `$*` and `$@` both show all arguments together, but the former one is a string [concatenated with spaces](characters used to join arguments can be changed) and the latter is a list
-- `$0` is the command running - for example, the filename of script you have launched, `/bin/bash` when you open terminal
+- `$#` is the number of arguments passed to script (like `argc` in C)
+- `$1`, `$2` etc. are positional arguments passed to function/scripts (like `argv[..]` in C)
+- `$*` and `$@` both show all arguments together, but the former one is a string and the latter is a list
+- `$IFS` is the Internal Field Separator - it is used to split strings into tokens, whitespace if unset
+- `$RANDOM` is a random number between 0 and 32767
+- `$LINENO` is the current line number in the script
+- `$0` is the command running - for example, the filename of script you have launched
 
+Other variables will be shown during the LCLG series when they are needed
+
+---
 
 # Branching code
 
-It is often necessary to run some code only if some condition is true. For that purpose Bash has `if-then-elif-else-fi` statements. Consider the following example:
+It is often necessary to run some code only if some condition is true. For that purpose Bash has `if-then-elif-else-fi` and `case-in-esac` statements
+
+## Using if statements
+
+Consider the following example:
 
 ```bash
 if grep "Some text" file.txt
@@ -111,15 +130,20 @@ fi
 
 Here Bash will first run the `grep "Some text" file.txt` command and check its exit code (remember `$?`?). If it is zero, then it will run the first echo and continue running code after `fi` keyword. Otherwise, it will run and check exit code of the second `grep` command and decide which `echo` to run
 
-But how do you compare some variables? It seems like you need a command to run there, but which? And this is where the fun begins
-
-If you prefer plain POSIX syntax, the you have `test` command or `[  ]` structure - both are effectively the same. Comparing strings here can be done using `test STRING1 = STRING2` or `[ STRING1 = STRING2 ]` (notice the spaces - there are necessary here!), but with integers you only have flags: `[ 2 -ge 1 ]` is *2 >= 1*. This often looks ugly and not convenient so Bash has another syntax
+But how do you compare some variables? It seems like you need a command to run there, but which? And this is where the fun begins. If you prefer plain POSIX syntax, the you have `test` command or `[  ]` structure - both are effectively the same. Comparing strings here can be done using `test STRING1 = STRING2` or `[ STRING1 = STRING2 ]` (notice the spaces - there are necessary here!), but with integers you only have flags: `[ 2 -ge 1 ]` is *2 >= 1*. This often looks ugly and not convenient so Bash has another syntax
 
 Faster and easier operator `[[  ]]` comes in hands when you write Bash scripts (who cares about POSIX anyway?). Using it you can compare integers normally: `[[ 1 == 1 ]]` (double equality sign is the same as single one), `[[ 3 < 5 ]]`. For strings everythings stays the same - `[[ -z STRING ]]` checks if STRING is zero-length. In general, you should prefer this syntax over `[  ]` and `test` for it being [more safe and fast](for example, [ $var = abc ] will give you error if $var is empty, so you can often see [ "x$var" = "xval" ])
 
-To inverse the result of the command or comparison running in `if`, use `if ! COMMAND` or `if [[ ! CONDITION ]]` or `if ! [[ CONDITION ]]`
+---
 
-In some cases it is inconvenient to write `if-then-fi` if you run just one-two commands in this branch, so you can use logical operators `&&` *and* and `||` *or*. For example, these two snippets behave the same
+# Branching code
+
+Other ways to branch code are given below
+
+## Using logical operators
+
+In some cases it is inconvenient to write `if-then-fi` if you run just one-two commands in this branch, so you can use logical operators `&&` *and*, `||` *or* and `!` *not* (the last can be used both in `[[  ]]` structure and before a command). For example, these two snippets behave exactly the same
+
 
 ```bash
 [[ "$var" = "test" ]] && echo "This is test"
@@ -129,6 +153,24 @@ if [[ "$var" == "test" ]]; then
 fi
 ```
 
+## Using case statements
+
+Another way to branch code is to use `case` statement. It is similar to case statements in other languages - you check a value and run the matching code. For example, this code will print the day of the week for a given number:
+
+```bash
+case "${1}" in
+    1) echo "Monday" ;;
+    2) echo "Tuesday" ;;
+    3) echo "Wednesday" ;;
+    4) echo "Thursday" ;;
+    5) echo "Friday" ;;
+    6) echo "Saturday" ;;
+    7) echo "Sunday" ;;
+    *) echo "Invalid day" ;;
+esac
+```
+
+---
 
 # Some cool features
 
@@ -137,8 +179,8 @@ fi
 There is another possibility to compare integers and do some operations with them. Check this code with comments:
 
 ```bash
-# Will print 27
-echo $(( 3 * 9 ))
+# Will print 27, 13
+echo "$(( 3 * 9 )), $[ 26 / 2 ]"
 
 # Compares $i // 7 and 3
 # Notice that division is rounded down:
@@ -156,14 +198,21 @@ echo "a = $a"
 
 ## Functions
 
-You can write functions in Bash using `function NAME { CODE; }` or `NAME() { CODE; }`, or combine both. You do not declare variables in parenthesis - you just use `$1` etc. to acces them
+You can write functions in Bash using `function NAME { CODE; }` or `NAME() { CODE; }`, or combine them. You do not declare variables in parenthesis - use `$1` etc. to acces them
 
-```terminal9
-sh
+```bash
+function myfunc {
+    echo "Hello, $1!"
+}
+
+myfunc "World"
 ```
 
+---
 
 # Loops
+
+To repeat some code several times with possibly different arguments, you can use loops. Bash has two types of loops: `for` and `while`
 
 ## for loops
 
@@ -179,17 +228,14 @@ Syntax for *while* loops is `while COMMANDS; do COMMANDS; done`. It runs command
 
 ## infinite loops
 
-To make an infinite loop, the best way is to use `while :; do` syntax. Alternatively you can use `true` instead of semicolon
+To make an infinite loop, the best way is to use `while :; do` syntax. Alternatively you can use `true` instead of semicolon. The other way is to use `for (( ;1; ))`, but this looks extremely unclear. By the way, GNU coreutils include `yes` command which just prints `y` infinitely (can also print other characters)
 
-```terminal15
-sh
-```
-
+---
 
 # To sum up
 
 Bash is a very powerful tool for scripting and automation. Its syntax might appear weird to you, but once you master it you can do incredible things with a simple shell script. Although it lacks support for floats and multi-dimensional arrays, using some clever hacks you can overcome this limitations and achieve your goals
 
-```terminal30
+```terminal24
 sh
 ```

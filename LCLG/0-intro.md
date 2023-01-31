@@ -13,10 +13,11 @@ styles:
 
 # Linux Command Line Guide - Introduction
 
-This guide will introduce you to the basics of Command Line Interface and some basic commmands
+This guide will introduce you to the basics of Command Line Interface and some most common commmands
 
-This is the first presentation in `Linux CLI Guides` series that will hopefully have many other slides
+This is the first presentation in *LCLG* series that will hopefully have many other slides
 
+---
 
 # GUI, TUI and CLI as different methods of communication with user
 
@@ -28,10 +29,11 @@ This is the first presentation in `Linux CLI Guides` series that will hopefully 
 [//]: #
 > CLI is much more simple to implement, and thus is often used in small tools such as `cat` and `ls`, but also is common among programs that might be used in scripting such as `ffmpeg` and `imagemagick`
 
-So, what exactly is a Command Line? Basically, it is a text interface using which you can interact with you operating system (Linux, MacOS and sometimes w\*ndows). Unlike GUI and TUI apps, you type every command - and call *executables* - yourself. A *shell* such as Bash (Bourne Again Shell) or Zsh is used to make our lives easier, it is the program that asks user user for command (through CLI), executes it and shows the result - [think about why do we need a special program for that](because it not only asks user for command, but also parses its arguments, sets environment variables, substitutes variables and commands, redirects output etc.)
+So, what exactly is a Command Line? Basically, it is a text interface using which you can interact with you operating system (Linux, MacOS and sometimes wᴉndows). Unlike GUI and TUI apps, you type every command - and call *executables* - yourself. A *shell* such as Bash (Bourne Again Shell) or Zsh is used to make our lives easier, it is the program that asks user user for command (through CLI), executes it and shows the result - [think about why do we need a special program for that](because it not only asks user for command, but also parses its arguments, sets environment variables, substitutes variables and commands, redirects output etc.)
 
-Several applications have been written that use interfaces becase of their adventages in some fields. To give you some ideas on what can be achieved using only CLI or TUI, I suggest you [searching for awesome-{cli,tui} on GitHub](https://github.com/agarrharr/awesome-cli-apps)
+Several applications have been written that use interfaces becase of their adventages in some fields. To give you some ideas on what can be achieved using only CLI or TUI, I suggest you [searching for awesome-{cli,tui} on GitHub](for example, here: https://github.com/rothgar/awesome-tuis)
 
+---
 
 # Linux starter pack - basic tools
 
@@ -49,6 +51,7 @@ Change directory. With no arguments returns you to `$HOME` (the *HOME* environme
 
 Print working directory. That's it. If the `-L` option is given, it will use `$PWD` environment variable and will not resolve symlinks
 
+---
 
 # Linux starter pack - basic tools
 
@@ -74,6 +77,7 @@ Leave ur dirty things with you, it's just **C**o**P**y. Usage - `cp <src> <dst>`
 
 Link files. Creates symlinks or hard links. To create the first type, use `ln -s <src> <dst>`. You don't need hard links if you don't know them
 
+---
 
 # Linux starter pack - basic tools
 
@@ -82,10 +86,6 @@ Some more things for you
 ## mktemp
 
 Make temporary file or directory. Used mostly in scripts to ensure that file will always be created and not overwritten. For usage see [mktemp(1)](man 1 mktemp, or just man mktemp)
-
-## man
-
-Manual pages is the place to learn how each command works, which arguments it can take etc. To read a *manpage*, type `man <topic>`, or `man <section> <topic>`. For example, type `man man` ~~no homo~~ to [get information about each section](1. Executables, 2. System calls, 3. Library calls, 4. Special files, 5. File formats, 6. Games, 7. Misc, 8. Sysadmin tools, 9. Kernel routines)
 
 ## echo
 
@@ -99,6 +99,61 @@ Reads a line from standard input (e.g. console) and stores it in a variable. Syn
 
 Display files content, or read from stdin. Examples: `cat script.py` to see content inside `script.py` file, `cat > myfile` to save whatever you will type until EOF (Ctrl+D) to `myfile`
 
+---
+
+# Sources for help
+
+It may happen that you need to quickly find what a certain command does and what arguments it takes. There are several ways which work in different cases
+
+## help flag
+
+Most commands accept a `-h` and/or `--help` key to show help. For example, `ls --help` will show you help for `ls` command. Note however that this is command-dependent and while this is a standard it's still up to programmers to decide which flags to use
+
+## help command
+
+Bash provides `help` command which can be used to get help on shell built-ins such as `if` and `for`. Type `help help` to learn more about it
+
+## man
+
+Manual pages is the place to learn how each command works, which arguments it can take etc. To read a *manpage*, type `man <topic>`, or `man <section> <topic>`. For example, type `man man` ~~no homo~~ to [get information about each section](1. Executables, 2. System calls, 3. Library calls, 4. Special files, 5. File formats, 6. Games, 7. Misc, 8. Sysadmin tools, 9. Kernel routines)
+
+## apropos and whatis
+
+Basically do the same as `man`, but display a short one-line description. The former searches for a keyword in both topic and description, the latter only in topic. For example, `apropos ls` will show you all commands that have `ls` in their name or description, and `whatis ls` will show you only the first line of `ls` manpage
+
+## info
+
+Info pages are similar to manpages, but are more user-friendly. To read an *infopage*, type `info <topic>`. For example, `info bash` will show you info about Bash shell
+
+---
+
+# Running on your machine
+
+Running everything on your computer has an advantage that you don't need to use internet to run each command and thus it's faster
+
+## Linux terminal
+
+If you own a Linux machine, you can just open a terminal emulator such as `gnome-terminal` or `konsole`, depending on your Distro/DE. Most likely you have shortcut such as `C-M-T`, `S-T` or `S-Return`. After you open it, just try out some commands discussed before. But be careful, if you remove some system files you might make your system very hard or impossible to recover!
+
+## WSL
+
+If you have wᴉndowz 10 or 11, you can install [Windows Subsystem for Linux](docs: https://docs.microsoft.com/en-us/windows/wsl/install) and run Linux commands in a terminal emulator. It's a bit slower than running on native Linux and some apps might break, but should still be better than virtual machines
+
+## JSLinux
+
+JSLinux also runs on your host, but in browser - as the name implies. It's a virtual machine that runs Linux kernel and emulates hardware. It's very useful for learning Linux, but it still requires internet to get files and executables as they are needed. Some systems even support persistent network storage, so you can continue your work from any device
+
+---
+
+# Running on the internet
+
+Running everything on the internet has an advantage that you don't need to install anything on your computer and thus it might be easier to get started, however it's slower and if you have bad internet connection then ~~good luck lmao~~ it will be hard to do anything
+
+## Replit
+
+A great option is to use an online terminal emulator such as [Replit](terminal: https://repl.it/languages/bash). It's a great place to try out commands and learn how they work. You can use the shell to run commands directly or write a *shell script* and execute it with one command/button (registration required for the latter)
+
+---
 
 # To sum up
 
